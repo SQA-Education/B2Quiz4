@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B2 Quiz 4: Final Test: Mixed Grammar & Vocabulary</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px}
+.container{max-width:700px;margin:0 auto}
+.header{background:#fff;border-radius:20px;padding:25px;margin-bottom:20px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.header h1{color:#764ba2;font-size:1.4em;margin-bottom:5px}
+.quiz-badge{background:#667eea;color:#fff;padding:4px 12px;border-radius:20px;font-size:.8em;display:inline-block;margin-bottom:10px}
+.level-tag{background:#f0e6ff;color:#764ba2;padding:3px 10px;border-radius:10px;font-size:.75em;margin-left:8px}
+.timer-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:15px;padding:10px;background:#fff3cd;border-radius:10px}
+.timer-bar .icon{font-size:1.3em}
+.timer-bar .time{font-size:1.2em;font-weight:700;color:#856404}
+.timer-bar.warning{background:#ffebee}
+.timer-bar.warning .time{color:#c62828}
+.card{background:#fff;border-radius:16px;padding:25px;margin-bottom:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.progress-text{font-size:.9em;color:#666}
+.xp-display{background:#f0e6ff;padding:6px 12px;border-radius:20px;font-weight:600;color:#764ba2;font-size:.9em}
+.progress-bar-bg{height:8px;background:#e0e0e0;border-radius:4px;overflow:hidden;margin-bottom:20px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:4px;transition:width 0.3s}
+.question{margin-bottom:25px}
+.question-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:15px}
+.question-num{background:#764ba2;color:#fff;min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9em}
+.question-text{font-size:1.1em;color:#333;font-weight:500;line-height:1.4}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{padding:15px;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s}
+.option:hover{border-color:#764ba2;background:#f0e6ff}
+.option.selected{border-color:#764ba2;background:#e0d4f7}
+.option.correct{border-color:#22c55e;background:#f0fdf4}
+.option.incorrect{border-color:#ef4444;background:#fef2f2}
+.option.disabled{pointer-events:none}
+.option-letter{width:28px;height:28px;border:2px solid #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.85em;flex-shrink:0}
+.option.selected .option-letter{border-color:#764ba2;background:#764ba2;color:#fff}
+.option.correct .option-letter{border-color:#22c55e;background:#22c55e;color:#fff}
+.option.incorrect .option-letter{border-color:#ef4444;background:#ef4444;color:#fff}
+.option-text{flex:1}
+.feedback{margin-top:10px;padding:12px 15px;border-radius:10px;font-size:.9em;display:none}
+.feedback.correct{background:#f0fdf4;border:1px solid #22c55e;color:#166534}
+.feedback.incorrect{background:#fef2f2;border:1px solid #ef4444;color:#991b1b}
+.feedback.show{display:block}
+.btn{background:#764ba2;color:#fff;border:none;padding:14px 32px;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;width:100%;margin-top:15px;transition:all .2s}
+.btn:hover{background:#5a3d7a}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.btn-next{background:#22c55e}
+.btn-next:hover{background:#16a34a}
+.btn-dashboard{background:#F5A623;margin-top:15px}
+.btn-dashboard:hover{background:#e09000}
+.results-screen{display:none}
+.results-card{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:20px;padding:35px;color:#fff;text-align:center}
+.results-score{font-size:4em;font-weight:700}
+.results-label{font-size:1.2em;opacity:.9;margin-top:5px}
+.results-message{font-size:1.2em;margin-top:20px;padding:15px;background:rgba(255,255,255,.15);border-radius:12px}
+.results-xp{margin-top:20px;font-size:1.1em}
+.results-xp span{font-size:1.5em;font-weight:700}
+.results-details{background:#fff;border-radius:16px;padding:20px;margin-top:20px;color:#333}
+.results-details h3{color:#764ba2;margin-bottom:15px}
+.result-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
+.result-row:last-child{border-bottom:none}
+.practice-section{background:#fff;border-radius:16px;padding:20px;margin-top:20px;border-left:4px solid #ef4444}
+.practice-section.success{border-left-color:#22c55e}
+.practice-section h3{color:#333;margin-bottom:15px;display:flex;align-items:center;gap:10px}
+.practice-item{background:#fef2f2;border-radius:10px;padding:15px;margin-bottom:10px}
+.practice-item.success{background:#f0fdf4}
+.practice-item h4{color:#333;margin-bottom:8px;font-size:.95em}
+.practice-item p{color:#666;font-size:.85em;margin-bottom:10px}
+.practice-item ul{margin:10px 0;padding-left:20px;color:#666;font-size:.85em}
+.practice-item a{display:inline-block;background:#764ba2;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.85em;font-weight:600}
+.weak-tag{display:inline-block;background:#ffebee;color:#c62828;padding:4px 10px;border-radius:15px;font-size:.8em;margin:3px;font-weight:500}
+.strong-tag{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 10px;border-radius:15px;font-size:.8em;margin:3px;font-weight:500}
+.new-badge{background:#fff3cd;border:2px solid #ffc107;border-radius:12px;padding:15px;margin-top:15px;text-align:center}
+.new-badge h4{color:#856404;margin-bottom:5px}
+.new-badge .badge-icon{font-size:2em}
+.streak-box{background:linear-gradient(135deg,#f093fb,#f5576c);border-radius:12px;padding:15px;margin-top:15px;color:#fff;text-align:center}
+.streak-num{font-size:1.5em;font-weight:700}
+.name-section{margin-bottom:20px}
+.name-section input{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px}
+.name-section input:focus{outline:none;border-color:#764ba2}
+.class-section{margin:15px 0}
+.class-section select{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;background:#fff;cursor:pointer}
+.class-section select:focus{outline:none;border-color:#764ba2}
+.start-card{text-align:center}
+.start-card h2{color:#764ba2;margin-bottom:10px}
+.start-card p{color:#666;margin-bottom:20px}
+.start-info{background:#f0e6ff;border-radius:12px;padding:15px;margin-bottom:20px;text-align:left}
+.start-info li{margin:8px 0;color:#555}
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="startScreen">
+    <div class="header">
+      <div class="quiz-badge">Quiz 4 of 4 (Final)</div>
+      <span class="level-tag">B2 Upper-Intermediate</span>
+      <h1>💼 Final Test: Mixed Grammar & Vocabulary</h1>
+      <p style="color:#666;font-size:.9em">Test your knowledge from Class 16 • Term 1/2026</p>
+    </div>
+    <div class="card start-card">
+      <h2>Welcome! 👋</h2>
+      <p>Test what you learned in Class 16</p>
+      <div class="start-info"><ul>
+        <li>⏱️ 30 questions • 20 minutes</li>
+        <li>⭐ Earn XP for correct answers</li>
+        <li>🏆 Unlock badges for great performance</li>
+        <li>📊 Get personalized practice tips</li>
+      </ul></div>
+      <div class="name-section"><input type="text" id="studentName" placeholder="Enter your full name..."></div>
+      <div class="class-section">
+        <select id="studentClass">
+          <option value="">Select your class...</option>
+          <option value="3089-MW-630PM">3089 - Mon/Wed 6:30 PM (Jonelle)</option>
+          <option value="3092-MW-830PM">3092 - Mon/Wed 8:30 PM (Jonelle)</option>
+          <option value="3096-TTH-630PM">3096 - Tue/Thu 6:30 PM (Angela)</option>
+          <option value="3100-TTH-830PM">3100 - Tue/Thu 8:30 PM (Angela)</option>
+        </select>
+      </div>
+      <button class="btn" onclick="startQuiz()">Start Quiz →</button>
+    </div>
+  </div>
+
+  <div id="quizScreen" style="display:none">
+    <div class="header">
+      <div class="quiz-badge">Quiz 4 of 4 (Final)</div>
+      <h1>💼 Final Test: Mixed Grammar & Vocabulary</h1>
+      <div class="timer-bar" id="timerBar">
+        <span class="icon">⏱️</span>
+        <span class="time" id="timer">20:00</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="progress-row">
+        <span class="progress-text">Question <span id="currentQ">1</span> of <span id="totalQ">30</span></span>
+        <span class="xp-display">⭐ <span id="currentXP">0</span> XP</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:3.33%"></div></div>
+      <div id="questionContainer"></div>
+      <button class="btn" id="checkBtn" onclick="checkAnswer()" disabled>Check Answer</button>
+      <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+    </div>
+  </div>
+
+  <div class="results-screen" id="resultsScreen">
+    <div class="results-card">
+      <p style="opacity:.8">Quiz Complete!</p>
+      <div class="results-score" id="finalScore">0/30</div>
+      <div class="results-label" id="finalPercent">0%</div>
+      <div class="results-message" id="resultsMessage">Great job!</div>
+      <div class="results-xp">You earned <span id="earnedXP">0</span> XP! ⭐</div>
+    </div>
+    <div class="results-details">
+      <h3>📊 Your Results</h3>
+      <div class="result-row"><span>Correct Answers</span><span id="correctCount">0/30</span></div>
+      <div class="result-row"><span>Time Taken</span><span id="timeTaken">0:00</span></div>
+      <div class="result-row"><span>XP Earned</span><span id="xpEarned">0</span></div>
+    </div>
+    <div class="practice-section" id="practiceSection">
+      <h3 id="practiceTitle">📚 Areas to Practice</h3>
+      <div id="practiceContent"></div>
+    </div>
+    <div id="newBadgeSection"></div>
+    <div id="streakSection"></div>
+    <button id="formSubmitBtn" onclick="submitToTeacher()" style="background:linear-gradient(135deg,#f5a623,#e8470a);color:#fff;padding:20px;border-radius:14px;font-size:1.15em;font-weight:800;text-align:center;border:none;display:block;width:100%;box-sizing:border-box;letter-spacing:.5px;box-shadow:0 6px 20px rgba(245,166,35,.4);cursor:pointer;margin-top:20px;">📨 SUBMIT RESULTS TO TEACHER →</button>
+<div id="submitStatus" style="display:none;margin-top:16px;background:#f0fdf4;border:2px solid #22c55e;border-radius:12px;padding:16px;text-align:center;color:#15803d"></div>
+    
+    
+    
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY='SQA_B2_Quiz_Progress',QUIZ_ID=4,QUIZ_NAME='B2 Quiz 4: Final Test: Mixed Grammar & Vocabulary (Class 16)',LEVEL='B2';
+const allQuestions=[{"q": "Choose the meaning of the word assist in: 'The teacher assists her students every day.'", "opts": ["To avoid someone", "To help someone", "To ignore someone", "To criticize someone"], "correct": 1, "category": "vocabulary", "explanation": "'Assist' means to help someone."}, {"q": "Manager: 'The marketing department keeps asking me for that sales presentation. What should I tell them?' Employee: '_________________'", "opts": ["I will already send it tomorrow morning.", "I have already sent it to your email.", "I am already send it to your email.", "I finish it next week."], "correct": 1, "category": "present_perfect", "explanation": "'I have already sent it' = present perfect showing a completed action with present relevance."}, {"q": "Choose the meaning of the word proactive in: 'She takes proactive steps to improve her skills.'", "opts": ["To avoid responsibilities", "To react after something happens", "To take action in advance", "To wait for instructions"], "correct": 2, "category": "vocabulary", "explanation": "'Proactive' means taking action in advance, before problems arise."}, {"q": "What is the main purpose of a Job Portal?", "opts": ["To schedule interviews with your current employer", "To post personal blogs about your work experience", "To search and apply for job opportunities online", "To negotiate your salary directly with companies"], "correct": 2, "category": "vocabulary", "explanation": "A job portal is an online platform used to search and apply for job opportunities."}, {"q": "'The new interns are working in the conference room today, __________?'", "opts": ["don't they", "aren't they", "didn't they", "are they"], "correct": 1, "category": "question_tags", "explanation": "Positive present continuous 'are working' → negative tag 'aren't they?'"}, {"q": "Read these situations and choose which one best describes something overwhelming:", "opts": ["'I just started a new job. There are 50 emails to answer, three projects due this week, and five meetings tomorrow. I don't know where to start!'", "'I'm reading a book in my garden. The weather is perfect today.'", "'I just finished my coffee and I'm ready to start work.'", "'The bus was five minutes late this morning.'"], "correct": 0, "category": "vocabulary", "explanation": "'Overwhelming' means having too much to deal with at once — the first situation clearly shows this."}, {"q": "'Tip for improving your English: You ______ practice using English every day if you want to improve quickly.'", "opts": ["need", "might", "should", "would"], "correct": 2, "category": "modals", "explanation": "'Should' is used to give advice or recommendations."}, {"q": "Which sentence correctly uses the phrasal verb turn down?", "opts": ["I turned down the job offer because the salary was too low.", "I turned down my resume to the manager yesterday.", "I turned down the computer and started working.", "I turned down an application to find remote work."], "correct": 0, "category": "phrasal_verbs", "explanation": "'Turn down' means to reject/refuse an offer or request."}, {"q": "Which of the following situations is an example of mentoring?", "opts": ["A manager gives an employee a list of tasks without explaining how to do them.", "An experienced engineer regularly meets with a new hire to offer advice and career guidance.", "A teacher assigns homework but doesn't discuss it with the students afterward.", "Two coworkers are competing to see who can finish their project first."], "correct": 1, "category": "vocabulary", "explanation": "Mentoring involves an experienced person regularly guiding and advising someone less experienced."}, {"q": "'You ______ submit the report by Friday. The client meeting is Monday morning.'", "opts": ["could", "need", "must", "might"], "correct": 2, "category": "modals", "explanation": "'Must' expresses strong obligation — the deadline is firm and non-negotiable."}, {"q": "'Just a reminder: The deadline for the project is Friday.' What does deadline mean?", "opts": ["A disagreement between two people.", "A time limit for completing a task.", "A project proposal.", "A task that can be done anytime."], "correct": 1, "category": "vocabulary", "explanation": "A 'deadline' is the latest time or date by which something must be completed."}, {"q": "Read the timeline: March 22: Had a job interview. Today: March 29. Choose the correct sentence:", "opts": ["I have job interview yesterday.", "I am having job interview last week.", "I had a job interview last week.", "Will have job interview last week."], "correct": 2, "category": "past_simple", "explanation": "The interview was last week (completed, specific time) → past simple: I had a job interview last week."}, {"q": "Which of the following is a formal letter sent with a job application that explains how your skills and experience match the position?", "opts": ["Cover letter", "Tax forms", "Resume", "Reference letter"], "correct": 0, "category": "vocabulary", "explanation": "A cover letter is sent with a job application explaining why you are a good fit for the position."}, {"q": "Friend: 'What are your plans for the summer?' You: 'I ____________________ a summer course at the community college this summer.'", "opts": ["going to take", "am going to take", "will going to take", "will going take"], "correct": 1, "category": "future", "explanation": "'Am going to take' = planned future intention. 'Going to take' without 'am' is grammatically incomplete."}, {"q": "Choose the meaning of initiative in: 'He showed initiative by starting the project without being asked.'", "opts": ["Waiting for orders", "Avoiding work", "Taking action independently", "Complaining about a task"], "correct": 2, "category": "vocabulary", "explanation": "'Initiative' means taking action on your own without being told to."}, {"q": "'We ______ have informed the client earlier.' (after missing a deadline)", "opts": ["must to", "should", "can", "mights"], "correct": 1, "category": "modals", "explanation": "'Should have + past participle' expresses regret about a past action. 'Must to' and 'mights' are not valid forms."}, {"q": "'My back was hurting, so I adjusted the chair to make it more comfortable.' What does adjusted mean?", "opts": ["To give someone advice", "To change something slightly", "To remove something", "To avoid something"], "correct": 1, "category": "vocabulary", "explanation": "'Adjusted' means to change or move something slightly to make it better or more suitable."}, {"q": "Calendar: Team Meeting (Tomorrow). Choose the grammatically correct sentence:", "opts": ["She going to the meeting tomorrow.", "They will discuss the project next week.", "He is going finish the report later today.", "I will attended the meeting next week."], "correct": 1, "category": "future", "explanation": "'They will discuss the project next week' is grammatically correct. The others have missing verbs, missing 'to', or wrong verb forms."}, {"q": "Which of the following defines an academic degree?", "opts": ["A certificate given for attending a workshop or seminar.", "A qualification awarded by a university after completing a course of study.", "A membership in a professional organization or club.", "A permission letter to enter a university campus."], "correct": 1, "category": "vocabulary", "explanation": "An academic degree is a qualification awarded by a university after completing a course of study."}, {"q": "'Looking at Sarah's progress this year: She ______ improved her communication skills.'", "opts": ["has", "have", "had", "is"], "correct": 0, "category": "present_perfect", "explanation": "She (third person singular) + present perfect = 'has improved'."}, {"q": "Choose the meaning of calm down in: 'He tried to calm down after the argument.'", "opts": ["To become more active.", "To relax after being upset.", "To make a situation worse.", "To avoid a conversation."], "correct": 1, "category": "phrasal_verbs", "explanation": "'Calm down' means to become less upset, angry, or excited — to relax."}, {"q": "'If Sarah ______ the lottery, she ______ a big house.' Complete:", "opts": ["wins/bought", "wins/would buy", "won/would buy", "won/bought"], "correct": 2, "category": "conditionals", "explanation": "Second conditional (hypothetical): If + past simple, would + base verb → 'If she won, she would buy.'"}, {"q": "Choose the option that describes a positive emotion:", "opts": ["Annoyed", "Frustrated", "Proud", "Nervous"], "correct": 2, "category": "vocabulary", "explanation": "'Proud' is a positive emotion — feeling satisfaction and pleasure about an achievement."}, {"q": "Read this email explaining an absence. Which sentence is grammatically correct?", "opts": ["She was late because she miss the bus.", "He didn't come because he was sick.", "We going to the meeting because we have time.", "They come late because they got lost."], "correct": 1, "category": "past_simple", "explanation": "'He didn't come because he was sick' is correct past simple. The others have incorrect verb forms."}, {"q": "Choose the meaning of qualifications in a job context:", "opts": ["The skills and knowledge needed for a job.", "The tasks completed in a job.", "The experience of working in a team.", "The salary expectations for a job."], "correct": 0, "category": "vocabulary", "explanation": "'Qualifications' refers to the skills, knowledge, and credentials needed for a job."}, {"q": "Direct question: 'Where is the nearest coffee shop?' Polite version: 'Excuse me, ______________________'", "opts": ["Do you know where is the nearest coffee shop?", "Do you know where the coffee shop nearest is?", "Can you tell me where is the nearest coffee shop?", "Could you tell me where the nearest coffee shop is?"], "correct": 3, "category": "indirect_questions", "explanation": "Indirect questions use statement word order. Only 'Could you tell me where the nearest coffee shop is?' is correct."}, {"q": "Which of the following words best describes a sharp and sudden increase in prices?", "opts": ["Hike", "Flexibility", "Roll back", "Gaggle"], "correct": 0, "category": "vocabulary", "explanation": "A 'hike' (price hike) describes a sharp and sudden increase in prices."}, {"q": "'Lisa got a promotion. Instead of feeling happy for her, Sarah feels bad because she wishes she had gotten the promotion instead.' What feeling describes Sarah?", "opts": ["excited", "jealous", "angry", "grateful"], "correct": 1, "category": "vocabulary", "explanation": "'Jealous' describes feeling envious of someone else's success or possessions."}, {"q": "Read these questions at a customer service desk. Which one would be considered rude?", "opts": ["Could you tell me when the store closes?", "Can you explain how this works?", "Do you know by any chance where the exit is?", "What do you want?"], "correct": 3, "category": "indirect_questions", "explanation": "'What do you want?' is very direct and rude. The other options use polite, indirect language."}, {"q": "'Our new app helps you practice mindfulness daily.' What does mindfulness mean?", "opts": ["Planning future activities carefully.", "Remembering past events in detail.", "Being careful not to make mistakes.", "Being fully focused on the present moment."], "correct": 3, "category": "vocabulary", "explanation": "'Mindfulness' is the practice of being fully focused and aware of the present moment."}];
+const practiceResources={"vocabulary": {"title": "Professional & Workplace Vocabulary", "description": "Key words for the workplace, job seeking, and professional communication.", "tips": ["Proactive = taking action before problems arise", "Initiative = acting independently without being told", "Deadline = time limit for completing a task", "Qualifications = skills and credentials needed for a job", "Mindfulness = being fully present in the moment"], "link": "https://www.youtube.com/results?search_query=professional+vocabulary+english+B2"}, "present_perfect": {"title": "Present Perfect", "description": "Using have/has + past participle for recent, relevant completed actions.", "tips": ["Already = completed before expected time", "I have already sent it = relevant to now", "She HAS improved (3rd person singular)", "Present perfect ≠ simple past — no specific past time expression"], "link": "https://www.youtube.com/results?search_query=present+perfect+B2+grammar"}, "modals": {"title": "Modal Verbs", "description": "Using must, should, could, might for obligation, advice, and possibility.", "tips": ["Must = strong obligation (you have no choice)", "Should = advice or recommendation", "Should have + past participle = regret about the past", "Could = weaker suggestion or past ability", "Modals NEVER take 'to' after them (not 'must to')"], "link": "https://www.youtube.com/results?search_query=modal+verbs+must+should+could+B2+english"}, "future": {"title": "Future Forms", "description": "Will, going to, and present continuous for future events.", "tips": ["Am going to = planned intention", "Will = promise, spontaneous decision", "'Am going to take' — don't drop 'am'", "'Will attended' is WRONG — use base verb after will", "Present continuous = fixed arrangement"], "link": "https://www.youtube.com/results?search_query=future+forms+B2+english+will+going+to"}, "conditionals": {"title": "Second Conditional", "description": "Hypothetical situations using if + past simple + would.", "tips": ["Second conditional = imaginary/unlikely situations", "If + past simple, would + base verb", "'If she won, she would buy' ✓", "'If she wins, she would buy' ✗ (mixed forms)", "Would never changes: I/you/he/she/we/they + would"], "link": "https://www.youtube.com/results?search_query=second+conditional+english+B2"}, "past_simple": {"title": "Past Simple", "description": "Using past simple for completed actions at a specific time.", "tips": ["Use with: last week, yesterday, in 2020", "'I had a job interview last week' ✓", "Past simple: didn't + base verb for negatives", "he/she/it → didn't (not 'doesn't')", "Irregular: have → had, go → went, lead → led"], "link": "https://www.youtube.com/results?search_query=past+simple+B2+english+grammar"}, "phrasal_verbs": {"title": "Phrasal Verbs", "description": "Common phrasal verbs for professional and daily life contexts.", "tips": ["Turn down = to reject/refuse", "Calm down = to become less upset", "Cut down = to reduce", "Let go = to release/stop holding on to something", "Take a break = to pause and rest"], "link": "https://www.youtube.com/results?search_query=phrasal+verbs+professional+english+B2"}, "question_tags": {"title": "Question Tags", "description": "Short questions added to the end of statements.", "tips": ["are + -ing → aren't they?", "Positive → negative tag", "Negative → positive tag"], "link": "https://www.youtube.com/results?search_query=question+tags+english+B2"}, "indirect_questions": {"title": "Indirect Questions", "description": "Polite question forms using statement word order.", "tips": ["Could you tell me where the room IS? ✓", "NOT: Could you tell me where IS the room? ✗", "Rude = direct question without politeness markers", "'Could you / Do you know / I wonder' → statement order after"], "link": "https://www.youtube.com/results?search_query=indirect+questions+polite+english+B2"}};
+let questions=[],currentQuestion=0,score=0,xpEarned=0,answered=false,timerInterval,timeLeft=1200,startTime,studentName='',studentClass='',studentLevel='',categoryResults={};
+function shuffle(a){const arr=[...a];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function getProgress(){const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):{quizzes:{},totalXP:0,streak:0,badges:[],name:''};}
+function saveProgress(p){localStorage.setItem(STORAGE_KEY,JSON.stringify(p));}
+function startQuiz(){studentName=document.getElementById('studentName').value.trim();studentLevel='B2 (JS1) - Upper-Intermediate';studentClass=document.getElementById('studentClass').value;if(!studentName){alert('Please enter your name');return;}if(!studentClass){alert('Please select your class');return;}const progress=getProgress();progress.name=studentName;saveProgress(progress);questions=shuffle([...allQuestions]);questions=questions.map(q=>{const opts=q.opts.map((o,i)=>{return{text:o,wasCorrect:i===q.correct}});const sh=shuffle(opts);return{...q,opts:sh.map(o=>o.text),correct:sh.findIndex(o=>o.wasCorrect)}});questions.forEach(q=>{if(!categoryResults[q.category])categoryResults[q.category]={correct:0,total:0};categoryResults[q.category].total++;});document.getElementById('startScreen').style.display='none';document.getElementById('quizScreen').style.display='block';document.getElementById('totalQ').textContent=questions.length;startTime=Date.now();startTimer();renderQuestion();}
+function startTimer(){timerInterval=setInterval(()=>{timeLeft--;const m=Math.floor(timeLeft/60),s=String(timeLeft%60).padStart(2,'0');document.getElementById('timer').textContent=m+':'+s;if(timeLeft<=60)document.getElementById('timerBar').classList.add('warning');if(timeLeft<=0){clearInterval(timerInterval);finishQuiz();}},1000);}
+function renderQuestion(){const q=questions[currentQuestion];document.getElementById('currentQ').textContent=currentQuestion+1;document.getElementById('progressBar').style.width=((currentQuestion+1)/questions.length*100)+'%';let html=`<div class="question"><div class="question-header"><div class="question-num">${currentQuestion+1}</div><div class="question-text">${q.q}</div></div><div class="options">`;q.opts.forEach((o,i)=>{html+=`<div class="option" data-idx="${i}" onclick="selectOption(this)"><div class="option-letter">${String.fromCharCode(65+i)}</div><div class="option-text">${o}</div></div>`;});html+=`</div><div class="feedback" id="feedback"></div></div>`;document.getElementById('questionContainer').innerHTML=html;document.getElementById('checkBtn').disabled=true;document.getElementById('checkBtn').style.display='block';document.getElementById('nextBtn').style.display='none';answered=false;}
+function selectOption(el){if(answered)return;document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');document.getElementById('checkBtn').disabled=false;}
+function checkAnswer(){if(answered)return;answered=true;const sel=document.querySelector('.option.selected');if(!sel)return;const idx=parseInt(sel.dataset.idx),q=questions[currentQuestion],correct=idx===q.correct;if(correct)categoryResults[q.category].correct++;document.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));if(correct){sel.classList.add('correct');score++;xpEarned+=10;document.getElementById('currentXP').textContent=xpEarned;}else{sel.classList.add('incorrect');document.querySelectorAll('.option')[q.correct].classList.add('correct');}const fb=document.getElementById('feedback');fb.className='feedback '+(correct?'correct':'incorrect')+' show';fb.innerHTML=(correct?'✅ <strong>Correct!</strong> ':'❌ <strong>Not quite.</strong> ')+q.explanation;document.getElementById('checkBtn').style.display='none';document.getElementById('nextBtn').style.display='block';document.getElementById('nextBtn').textContent=currentQuestion<questions.length-1?'Next Question →':'See Results →';}
+function nextQuestion(){currentQuestion++;if(currentQuestion<questions.length)renderQuestion();else finishQuiz();}
+function finishQuiz(){clearInterval(timerInterval);const timeTaken=Math.round((Date.now()-startTime)/1000),percent=Math.round((score/questions.length)*100);if(percent===100)xpEarned+=20;else if(percent>=80)xpEarned+=10;if(timeTaken<180)xpEarned+=10;const progress=getProgress();progress.quizzes=progress.quizzes||{};progress.quizzes[QUIZ_ID]={score,total:questions.length,time:timeTaken,date:new Date().toISOString(),categories:categoryResults};progress.totalXP=(progress.totalXP||0)+xpEarned;const newBadges=[];progress.badges=progress.badges||[];if(!progress.badges.includes('first_steps')){progress.badges.push('first_steps');newBadges.push({name:'First Steps',icon:'🌟'});}if(percent===100&&!progress.badges.includes('sharpshooter')){progress.badges.push('sharpshooter');newBadges.push({name:'Sharpshooter',icon:'🎯'});}if(timeTaken<180&&!progress.badges.includes('speed_demon')){progress.badges.push('speed_demon');newBadges.push({name:'Speed Demon',icon:'⚡'});}const today=new Date().toDateString();if(progress.lastQuizDate!==today){progress.streak=(progress.streak||0)+1;progress.lastQuizDate=today;}if(progress.streak>=3&&!progress.badges.includes('on_fire')){progress.badges.push('on_fire');newBadges.push({name:'On Fire',icon:'🔥'});}const allQ=Object.values(progress.quizzes);if(allQ.length>=4&&allQ.every(q=>(q.score/q.total)>=0.8)&&!progress.badges.includes('b2_champion')){progress.badges.push('b2_champion');newBadges.push({name:'B2 Champion',icon:'🏆'});}saveProgress(progress);const{weakAreas,practiceHTML,status,practicePath}=generatePractice(percent);submitToForm(score,questions.length,percent,timeTaken,xpEarned,progress.totalXP,weakAreas,status,practicePath);document.getElementById('quizScreen').style.display='none';document.getElementById('resultsScreen').style.display='block';document.getElementById('finalScore').textContent=score+'/'+questions.length;document.getElementById('finalPercent').textContent=percent+'%';document.getElementById('earnedXP').textContent=xpEarned;document.getElementById('correctCount').textContent=score+'/'+questions.length;document.getElementById('timeTaken').textContent=Math.floor(timeTaken/60)+':'+String(timeTaken%60).padStart(2,'0');document.getElementById('xpEarned').textContent=xpEarned+' XP';let msg;if(percent===100)msg="🎉 PERFECT! You're amazing!";else if(percent>=90)msg="🌟 Excellent work!";else if(percent>=80)msg="👏 Great job!";else if(percent>=70)msg="👍 Good effort!";else if(percent>=60)msg="🌱 Keep practicing!";else msg="🤗 Don't give up!";document.getElementById('resultsMessage').textContent=msg;const ps=document.getElementById('practiceSection');if(percent>=80){ps.classList.add('success');document.getElementById('practiceTitle').innerHTML='✅ Great Job!';}document.getElementById('practiceContent').innerHTML=practiceHTML;if(newBadges.length>0){let h='';newBadges.forEach(b=>{h+=`<div class="new-badge"><div class="badge-icon">${b.icon}</div><h4>Badge Unlocked!</h4><p>${b.name}</p></div>`;});document.getElementById('newBadgeSection').innerHTML=h;}if(progress.streak>1)document.getElementById('streakSection').innerHTML=`<div class="streak-box"><div class="streak-num">🔥 ${progress.streak} Quiz Streak!</div></div>`;}
+function generatePractice(percent){const weak=[],strong=[];for(const[c,r]of Object.entries(categoryResults)){if(r.total>0&&(r.correct/r.total)<0.7)weak.push(c);else strong.push(c);}let html='';if(percent<60){html='<p style="color:#c62828;margin-bottom:15px;font-weight:600">Score below 60% — Please review:</p>';weak.forEach(a=>{if(practiceResources[a]){const r=practiceResources[a];html+=`<div class="practice-item"><h4>⚠️ ${r.title}</h4><p>${r.description}</p><ul>${r.tips.map(t=>`<li>${t}</li>`).join('')}</ul><a href="${r.link}" target="_blank">📺 Watch Videos</a></div>`;}});if(strong.length>0){html+='<p style="margin-top:15px;color:#2e7d32">Good at: ';strong.forEach(a=>{if(practiceResources[a])html+=`<span class="strong-tag">${practiceResources[a].title}</span>`;});html+='</p>';}}else if(percent<80){html='<p style="margin-bottom:15px">Consider reviewing:</p>';weak.forEach(a=>{if(practiceResources[a]){const r=practiceResources[a];html+=`<div class="practice-item"><h4>📖 ${r.title}</h4><p>${r.description}</p><a href="${r.link}" target="_blank">📺 Practice More</a></div>`;}});strong.forEach(a=>{if(practiceResources[a])html+=`<span class="strong-tag">✓ ${practiceResources[a].title}</span>`;});}else{html='<p style="color:#2e7d32;margin-bottom:10px">You did great on:</p>';Object.keys(practiceResources).forEach(a=>html+=`<span class="strong-tag">✓ ${practiceResources[a].title}</span>`);}const status=percent>=80?'B2 Complete!':percent>=60?'Review Recommended':'Practice Required';const path=weak.length>0?weak.map(a=>practiceResources[a]?practiceResources[a].title:a).join(', '):'None needed';return{weakAreas:path,practiceHTML:html,status,practicePath:path};}
+function submitToForm(score,total,percent,time,xp,totalXP,weak,status,path){
+  const nameWithClass=studentName+' · '+studentClass;
+  const timeStr=Math.floor(time/60)+':'+String(time%60).padStart(2,'0');
+  window._formPayload={
+    'entry.259682097': nameWithClass,
+    'entry.2006644851': studentLevel,
+    'entry.1804734502': QUIZ_NAME,
+    'entry.543583340': score+'/'+total,
+    'entry.875764515': percent+'%',
+    'entry.62512107': timeStr,
+    'entry.886790949': String(xp),
+    'entry.733779557': String(totalXP),
+    'entry.134668824': weak,
+    'entry.1786008516': status,
+    'entry.998097996': path
+  };
+}
+function submitToTeacher(){
+  const btn=document.getElementById('formSubmitBtn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Submitting...';}
+  const formData=new FormData();
+  if(window._formPayload){for(const[k,v]of Object.entries(window._formPayload)){formData.append(k,v);}}
+  fetch('https://docs.google.com/forms/d/e/1FAIpQLSd--80V_b4ovCyNW76LAYTbGy30gvafPtU39a3ijUWLO5mGng/formResponse',{method:'POST',mode:'no-cors',body:formData}).catch(function(){});
+  const status=document.getElementById('submitStatus');
+  if(status){status.innerHTML='✅ <strong>Results submitted successfully!</strong><br><span style="font-size:0.9em;color:#555">Your teacher has received your quiz results.</span>';status.style.display='block';}
+  if(btn){btn.style.display='none';}
+}
+function goToDashboard(){window.location.href='b2-quiz-dashboard.html';}
+function retryQuiz(){location.reload();}
+</script>
+</body>
+</html>
